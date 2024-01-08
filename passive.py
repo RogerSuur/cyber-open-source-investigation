@@ -1,5 +1,8 @@
 import sys
+import json
 import requests
+from bs4 import BeautifulSoup
+from datetime import datetime
 
 args = sys.argv
 
@@ -7,12 +10,65 @@ args = sys.argv
 def help():
     print("Welcome to passive v1.0.0\n"
           "OPTIONS:\n"
-          "-fn : Searches by full name like 'python3 passive.py -fn \"Jean Dupont\"'\n"
-          "-ip : Search with IP address, like 'python3 passive.py -ip 127.0.0.1'\n"
-          "-u : Searches with username like 'python3 passive.py -u \"@user01\"'")
+          "        -fn :     Search by full name like 'python3 passive.py -fn \"Jean Dupont\"'\n"
+          "        -ip :     Search with IP address, like 'python3 passive.py -ip 127.0.0.1'\n"
+          "         -u :     Search with username like 'python3 passive.py -u \"@user01\"'")
 
 def search_by_full_name(name):
     print(f"Searching by full name: {name}")
+    parts = name.split()
+    if len(parts) < 2:
+        print("Error: Full name must include first name and last name, separated by space.")
+        return
+
+    first_name, last_name = parts[0], parts[1]
+
+    try:
+        search_full_name(first_name, last_name)
+    except Exception as e:
+        print(e)
+
+def search_full_name(first_name, last_name):
+    if not first_name or not last_name:
+        raise ValueError("Please enter a name including first name and last name, separated by space.")
+
+    url = f"https://www.whitepages.be/Search/Person/?what={first_name} {last_name}&where="
+    response = requests.get(url)
+
+    if response.status_code != 200:
+        raise Exception("https://www.whitepages.be/Search/Person/ API ERROR, try again later")
+
+    soup = BeautifulSoup(response.text, 'html.parser')
+
+    results = []
+    general_data = soup.select("div.wg-results-list__item")
+    addresses = soup.select("span.wg-address")
+
+    for i, item in enumerate(general_data):
+        data_str = item['data-small-result']
+        try:
+            data = json.loads(data_str)
+        except json.JSONDecodeError:
+            data = {}
+        address = addresses[i].text.strip() if len(addresses) > i else "N/A"
+        name = data.get('title', 'N/A')
+        phone = data.get('phone', 'N/A')
+        results.append({"name": name, "phone": phone, "address": address})
+
+    if not results:
+        raise Exception("No results found with the given name.")
+
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename = f"results_{timestamp}.txt"
+    final_string = ""
+    with open(filename, "w") as file:
+        for i, result in enumerate(results):
+            final_string += f"\t RESULT {i+1} \n\n\tName:\t\t{result['name']}\n\tAddress:\t{result['address']}\n\tPhone:\t\t{result['phone']}\n\n"
+
+        print(final_string, end='')
+        file.write(final_string)
+    return final_string
+
 
 def search_by_ip(ip):
     print(f"Searching by IP: {ip}")
@@ -29,11 +85,13 @@ def check_all_usernames(username):
         "Instagram": check_instagram_username(username),
         "Reddit": check_reddit_username(username)
     }
-    with open("results.txt", "w") as file:
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename = f"results_{timestamp}.txt"
+    with open(filename, "w") as file:
         for platform, availability in results.items():
-            result_line = f"{platform}: {availability}\n"
-            print(result_line, end='')
-            file.write(result_line)
+            final_string = f"{platform}: {availability}\n"
+            print(final_string, end='')
+            file.write(final_string)
 
 
 def check_github_username(username):
