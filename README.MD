@@ -1,3 +1,14 @@
+1. Check if python3 is installed
+   python3 --version
+   If NOT(ubuntu):
+   sudo apt update
+   sudo apt install python3
+   (win):
+   download it from the python.org and add path
+2. Check the path
+   which python3
+   if NOT:
+
 $> passive --help
 
 Welcome to passive v1.0.0
