@@ -72,10 +72,43 @@ def search_full_name(first_name, last_name):
 
 def search_by_ip(ip):
     print(f"Searching by IP: {ip}")
+    url = f"http://ip-api.com/json/{ip}"
+    response = requests.get(url)
+
+    if response.status_code != 200:
+        print("API ERROR, try again later")
+        return
+
+    data = response.json()
+
+    if data['status'] != 'success':
+        print(f"Error: {data.get('message', 'Unknown error')}")
+        return
+
+    isp = data.get('isp', 'N/A')
+    city = data.get('city', 'N/A')
+    lat, lon = data.get('lat', 'N/A'), data.get('lon', 'N/A')
+
+    result_string = f"ISP: {isp}\nCity Lat/Lon: ({lat}) / ({lon})\n"
+
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename = f"result2_{timestamp}.txt"
+    with open(filename, "w") as file:
+        print(result_string, end='')
+        file.write(result_string)
+
+    return result_string
 
 def search_by_username(username):
-    print(f"Searching by username: {username}")
-    check_all_usernames(username)
+    if "@" not in username:
+        print("Error: Username must include an '@' symbol.")
+        return
+    else:
+        parts = username.split("@")
+        user = parts[1]
+    
+    print(f"Searching by username: {user}")
+    check_all_usernames(user)
 
 def check_all_usernames(username):
     results = {
@@ -105,7 +138,7 @@ def check_tiktok_username(username):
     return "Yes" if response.status_code == 200 else "No"
 
 def check_youtube_username(username):
-    url = f"https://www.youtube.com/{username}"
+    url = f"https://www.youtube.com/@{username}"
     response = requests.get(url)
     return "Yes" if response.status_code == 200 else "No"
 
