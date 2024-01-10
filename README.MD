@@ -1,40 +1,47 @@
+## General
+
+This is tool that gathers information from open source investigative methods.
+
+## Setup
+
 1. Check if python3 is installed
    python3 --version
    If NOT(ubuntu):
    sudo apt update
    sudo apt install python3
-   (win):
-   download it from the python.org and add path
-2. Check the path
-   which python3
-   if NOT:
 
-$> passive --help
+## Commands
 
-Welcome to passive v1.0.0
+### python3 passive.py --help
 
-OPTIONS:
--fn Search with full-name
--ip Search with ip address
--u Search with username
+shows different options
 
-$> passive -fn "Jean Dupont"
-First name: Jean
-Last name: Dupont
-Address: 7 rue du Progrès
-75016 Paris
-Number: +33601010101
-Saved in result.txt
+### python3 passive.py -fn "Jean Dupont"
 
-$> passive -ip 127.0.0.1
-ISP: FSociety, S.A.
-City Lat/Lon: (13.731) / (-1.1373)
-Saved in result2.txt
+Search adress and number associated with given name
 
-$> passive -u "@user01"
-Facebook : yes
-Twitter : yes
-Linkedin : yes
-Instagram : no
-Skype : yes
-Saved in result3.txt
+### python3 passive.py -u "@user1"
+
+Search social media with given user name
+
+### python3 passive.py -ip 127.0.0.1
+
+Search information about this ip adress.
+You can enter your ip for example. https://www.whatismyip.com/
+
+## Audit questions:
+
+https://github.com/01-edu/public/tree/master/subjects/cybersecurity/passive/audit
+
+### What is OSINT?
+
+OSINT aka Open-source intelligence is basically gathering information from open sources.
+
+### What are used investigative methods?
+
+The methods are investigative search by full name, ip address and username.
+
+### How this program works?
+
+This program reads commandline arguments (like -fn, -u, -ip) and provided argument for which we need to investigate on.
+For full name it does web scraping from www.whitepages.be, ip address it uses http://ip-api.com and username it checks if that platform userpage exists or not.

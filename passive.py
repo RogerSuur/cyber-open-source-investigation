@@ -89,7 +89,7 @@ def search_by_ip(ip):
     city = data.get('city', 'N/A')
     lat, lon = data.get('lat', 'N/A'), data.get('lon', 'N/A')
 
-    result_string = f"ISP: {isp}\nCity Lat/Lon: ({lat}) / ({lon})\n"
+    result_string = f"ISP: {isp}\nCity: {city}\nLat/Lon: ({lat}) / ({lon})\n"
 
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     filename = f"result2_{timestamp}.txt"
